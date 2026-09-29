@@ -1,0 +1,154 @@
+LongSpark
+Copyright (c) 2026 The LongSpark Authors
+
+Original project code is released under the MIT License; see LICENSE.
+Third-party code, evaluation data, and model weights retain their own terms.
+This notice records attribution and does not relicense third-party materials.
+
+================================================================================
+THIRD-PARTY SOFTWARE
+================================================================================
+SGLang — https://github.com/sgl-project/sglang
+License: Apache-2.0; full text: vendor/sglang/LICENSE
+Location: vendor/sglang/python/
+The vendored runtime contains LongSpark modifications for target/drafter
+execution, state export, and draft-model support. Original in-file copyright,
+license, and embedded third-party notices are retained. SGLang-derived helpers
+in vendor/specforge/modeling/target/sglang_backend/ retain the same terms.
+
+SpecForge — https://github.com/sgl-project/SpecForge
+Copyright (c) 2025 sgl-project
+License: MIT; full text: vendor/specforge/LICENSE
+Location: vendor/specforge/
+This model-only snapshot includes LongSpark extensions and omits training
+drivers. See vendor/specforge/VENDOR_README.md for its source inventory.
+Embedded adaptations retain the upstream terms described below.
+
+verl — https://github.com/volcengine/verl
+Copyright 2024 Bytedance Ltd. and/or its affiliates
+License: Apache-2.0; full text: vendor/sglang/LICENSE
+The Gather helper in vendor/specforge/distributed.py is adapted from
+verl/utils/ulysses.py at a0e8e4472b8b472409defb0c8fcc5162301450af.
+The source reference is retained next to the adapted class.
+
+DeepSpec — https://github.com/deepseek-ai/DeepSpec
+Copyright (c) 2026 The DeepSpec Authors
+Upstream license: MIT; text reproduced below.
+DSpark/EAGLE-3 checkpoint interfaces and benchmark prompt formats follow
+DeepSpec. The vendored runtime retains those model interfaces; baseline
+adapters are not part of this release.
+DeepSpec's code license does not replace the source datasets' terms.
+
+DFlash — https://github.com/z-lab/dflash
+Copyright (c) 2026 Z Lab
+Upstream license: MIT; text reproduced below.
+The DFlash model design is retained in the vendored SGLang runtime. The
+speculative baseline adapters and the vendored SpecForge DFlash modules are
+not part of this release.
+
+================================================================================
+EVALUATION DATA
+================================================================================
+The data/ directory contains selected, prompt-formatted, tokenized benchmark
+inputs. These transformations and the fixed-request subsets do not change
+upstream ownership or license terms. Source IDs and ordering are preserved.
+CodeSpan-specific modifications and source notices are recorded separately.
+No upstream project or data provider is implied to endorse this work.
+
+GSM8K — OpenAI
+Source: https://github.com/openai/grade-school-math
+License: MIT; Copyright (c) 2021 OpenAI; MIT text reproduced below.
+
+MATH-500 — Hugging Face H4 / OpenAI; original MATH benchmark by Dan Hendrycks et al.
+Source: https://huggingface.co/datasets/HuggingFaceH4/MATH-500
+The dataset card points to OpenAI's PRM800K MATH split. The source repositories
+declare MIT; their notices are retained here:
+  https://github.com/openai/prm800k — Copyright (c) 2023 OpenAI
+  https://github.com/hendrycks/math — Copyright (c) 2021 Dan Hendrycks
+MIT text reproduced below. The H4 card does not declare a separate license.
+
+AIME25 — MathArena
+Source: https://huggingface.co/datasets/MathArena/aime_2025
+Declared license: CC BY-NC-SA 4.0
+Terms: https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
+The questions originate from the AIME 2025 competition. Prompt formatting
+follows DeepSpec; Qwen3 chat formatting and tokenization are applied here.
+
+HumanEval — OpenAI
+Source: https://github.com/openai/human-eval
+License: MIT; Copyright (c) OpenAI (https://openai.com)
+MIT text reproduced below.
+
+MBPP — Google Research, Austin et al.
+Source: https://huggingface.co/datasets/google-research-datasets/mbpp
+Declared dataset license: CC BY 4.0
+Terms: https://creativecommons.org/licenses/by/4.0/legalcode
+The evaluation uses selected sanitized prompts with benchmark formatting.
+
+LiveCodeBench — LiveCodeBench authors
+Source: https://huggingface.co/datasets/livecodebench/code_generation_lite
+The dataset card labels the license only as "cc", without a specific variant.
+Problem statements originate from coding-contest platforms. Retain this
+attribution and consult the upstream terms; this notice does not assign a
+more specific Creative Commons variant than the upstream card provides.
+
+MT-Bench — LMSYS / Hugging Face H4
+Source: https://huggingface.co/datasets/HuggingFaceH4/mt_bench_prompts
+Declared dataset license: Apache-2.0; full text: vendor/sglang/LICENSE
+Original source: https://github.com/lm-sys/FastChat/tree/main/fastchat/llm_judge/data/mt_bench
+
+Alpaca — Stanford Alpaca authors
+Source: https://github.com/tatsu-lab/stanford_alpaca
+Dataset license: CC BY-NC 4.0 (distinct from its code license)
+Terms: https://github.com/tatsu-lab/stanford_alpaca/blob/main/DATA_LICENSE
+
+LongSpec — Sea AI Lab / LongSpec authors
+Source: https://huggingface.co/datasets/sail/longspec-data
+The collection's card declares MIT. Its book, code, and arXiv source material
+retains the respective source terms. This release selects and tokenizes
+77 prompts from the public collection, retaining domain and source IDs.
+
+LongSWE-Bench — LongCodeBench authors
+Source: https://huggingface.co/datasets/Steefano/LCB
+Code and construction: https://github.com/Zteefano/long-code-bench
+Paper: https://arxiv.org/abs/2505.07897
+Declared collection license: Apache-2.0; full text: vendor/sglang/LICENSE
+Included repository source excerpts retain their source licenses. The frozen
+subset retains repository, instance, and official-split identifiers.
+
+CodeSpan — LongSpark's curated source-code continuation inputs
+Public dataset: https://huggingface.co/datasets/Hehy/CodeSpan
+Source URLs, revisions, copyright notices, modification notice, and complete
+per-source license texts are retained in the public dataset
+(codespan_64K.jsonl and THIRD_PARTY_NOTICES.txt).
+These include MIT, BSD, Apache, GPL, AGPL, and other upstream terms. The
+collection is not relicensed under LongSpark's MIT code license.
+
+Model weights and binary dependencies are downloaded separately. The published
+Hehy/LongSpark-Qwen3-4B, Hehy/LongSpark-Qwen3-8B, and Hehy/LongSpark-Qwen3-14B
+drafter weights use the MIT License. Qwen3 targets retain their respective
+licenses. Only CodeSpan is a LongSpark-constructed dataset;
+the other evaluation workloads come from the public sources listed above.
+
+================================================================================
+MIT LICENSE TEXT FOR THE ATTRIBUTED MIT COMPONENTS ABOVE
+================================================================================
+The respective copyright statements are given in each component entry above.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

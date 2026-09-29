@@ -1,0 +1,14 @@
+{
+  "4B": {
+    "target": "models/4B/target",
+    "longspark": "models/4B/longspark"
+  },
+  "14B": {
+    "target": "models/14B/target",
+    "longspark": "models/14B/longspark"
+  },
+  "8B": {
+    "target": "models/8B/target",
+    "longspark": "models/8B/longspark"
+  }
+}

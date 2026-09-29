@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "status": "public-weights",
+  "review_date": "2026-09-29",
+  "code_revision": null,
+  "weights_license": "mit",
+  "models": {
+    "4B": {
+      "suggested_name": "LongSpark-Qwen3-4B",
+      "hub_repo_id": "Hehy/LongSpark-Qwen3-4B",
+      "hub_revision": "241060f1fdefdfe9b49d1a8a2c578670ac5e9d10",
+      "target_model": "Qwen/Qwen3-4B",
+      "target_candidate_revision": "1cfa9a7208912126459214e8b04321603b3df60c",
+      "target_config_sha256": "8ba006f74fecfaaeb392872a60f4a480e7ec9860153d2e1b769ec81f9a147f8a",
+      "target_full_weights_identity_verified": true,
+      "source_checkpoint": "epoch_009",
+      "parameter_count": 641778432,
+      "tensor_count": 65,
+      "dtype": "bfloat16",
+      "files": {
+        "config.json": {
+          "bytes": 1709,
+          "sha256": "1037df065503fcb8998538ddd7086b78e3b553b99368d8f3e7f6c3de64104512"
+        },
+        "model.safetensors": {
+          "bytes": 1283564720,
+          "sha256": "09f32fcefc1320f1d1f7966a42a6570408196d6acfc9ef7ef75d43e5d7294b19"
+        }
+      },
+      "weights_revision": "6c93c3767f5ff54e74fdc029ac09ae63481381a4"
+    },
+    "8B": {
+      "suggested_name": "LongSpark-Qwen3-8B",
+      "hub_repo_id": "Hehy/LongSpark-Qwen3-8B",
+      "hub_revision": "a0e73f6e9765bd9d3690150c90b77485401b92e0",
+      "target_model": "Qwen/Qwen3-8B",
+      "target_candidate_revision": "b968826d9c46dd6066d109eabc6255188de91218",
+      "target_config_sha256": "f7c4eadfbbf522470667b797a3c89be2524832d2d599797248dc304fff447c30",
+      "target_full_weights_identity_verified": true,
+      "source_checkpoint": "epoch_007",
+      "parameter_count": 1193882880,
+      "tensor_count": 65,
+      "dtype": "bfloat16",
+      "files": {
+        "config.json": {
+          "bytes": 1710,
+          "sha256": "b5fb7f9fbb311abb86fa03d434369f4b754b75b0c9d52bb4c3345fe748ccae11"
+        },
+        "model.safetensors": {
+          "bytes": 2387773688,
+          "sha256": "9aaf68a7992706e0832fb1ac3ae0b3f0d23f9c49dec054aa42398279627a2094"
+        }
+      },
+      "weights_revision": "0cc7678e79f058a44fc115728828d660b2987930"
+    },
+    "14B": {
+      "suggested_name": "LongSpark-Qwen3-14B",
+      "hub_repo_id": "Hehy/LongSpark-Qwen3-14B",
+      "hub_revision": "80026e740a7531c4699e42051f78b978ea0ada03",
+      "target_model": "Qwen/Qwen3-14B",
+      "target_candidate_revision": "40c069824f4251a91eefaf281ebe4c544efd3e18",
+      "target_config_sha256": "e73c3664ca09b10a673fef0c22e8a6b456201d49bd4713c9691f775720e8857a",
+      "target_full_weights_identity_verified": true,
+      "source_checkpoint": "epoch_008",
+      "parameter_count": 1965736192,
+      "tensor_count": 65,
+      "dtype": "bfloat16",
+      "files": {
+        "config.json": {
+          "bytes": 1712,
+          "sha256": "0a093ce69ddc699ffc2b9ef539147b17761947abc8e183b9ff71b077b473268e"
+        },
+        "model.safetensors": {
+          "bytes": 3931480336,
+          "sha256": "f11db171e2e9f3b8657af479ec8ae5808dc8d67fd3f54607a8929b701a148b4b"
+        }
+      },
+      "weights_revision": "14d11a2e9073f0c627ea2ddbb0399158422d8cbf"
+    }
+  },
+  "code_repository": "https://github.com/Hao-Yuan-He/LongSpark",
+  "code_release_status": "prepared-uncommitted"
+}

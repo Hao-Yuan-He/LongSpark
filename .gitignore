@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+/output/
+/results/
+/models/
+/data/
+/configs/models.local.json
+*.log
+.env

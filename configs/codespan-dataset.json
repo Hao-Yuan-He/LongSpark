@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "license": "Per-source upstream terms; see THIRD_PARTY_NOTICES.txt.",
+  "local_files": {
+    "codespan_64K.jsonl": "data/codespan_sources/codespan_64K.jsonl",
+    "longspark/code_64k.jsonl": "data/long_context/code_64k.jsonl",
+    "THIRD_PARTY_NOTICES.txt": "data/codespan_sources/THIRD_PARTY_NOTICES.txt",
+    "README.md": "docs/dataset_cards/CodeSpan.md"
+  },
+  "repo_id": "Hehy/CodeSpan",
+  "repo_type": "dataset",
+  "revision": "d0ec254c54a4b9a6a5a3e4d6f650f99ca3c467af",
+  "url": "https://huggingface.co/datasets/Hehy/CodeSpan",
+  "files_sha256": {
+    "LICENSE": "06a2f9dafb0e6d34871b11d40288fc0ae3c249f2519ea5df02707113db51e52f",
+    "README.md": "79e667248777a73f51f321fc66359e8100399dd6ca39cf7419b73211b5312a6f",
+    "THIRD_PARTY_NOTICES.txt": "d56555107ecf65c300bc9078e2dec1148bb7cd0fa2a7dfa828e32da8225f589e",
+    "codespan_64K.jsonl": "8b6f77183ce09ae3e5b4b0af65031ac15b8763a2719f304101d8d498cd29dfda",
+    "longspark/code_64k.jsonl": "8c1429a289e42cd539201dd46812b07f25f32f77b9540f665fcdbbc647b3fc65",
+    "release-manifest.json": "069f4e241e589c43fa59eeda5587188998b38211b72b6b9b17202051de7362d4",
+    "source-verification.json": "c54d11e32247d40c4a956e1890ab42057697941a863ed8eafb548874b9afada0"
+  },
+  "public": true,
+  "gated": false,
+  "anonymous_download_verified": true,
+  "datasets_load_verified": [
+    "default",
+    "longspark"
+  ],
+  "examples": 32,
+  "projects": 17,
+  "input_tokens_per_example": 65536,
+  "all_uploaded_files_match": true,
+  "all_prompts_reencode_exactly": true,
+  "dataset_page_http_status": 200,
+  "viewer_status": {
+    "ready": false,
+    "error_code": "ResponseNotReady",
+    "reason": "Hugging Face reports that its server is busier than usual; download and datasets loading are verified."
+  }
+}
