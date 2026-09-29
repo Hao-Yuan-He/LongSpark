@@ -1,4 +1,4 @@
-"""CPU-only slot bookkeeping, NOT a draft model or a CUDA context."""
+"""Draft stand-in for the vanilla (no speculation) method: CPU-only slot bookkeeping, no model."""
 import torch
 
 

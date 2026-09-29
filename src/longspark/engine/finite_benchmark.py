@@ -1,7 +1,7 @@
-"""Finite closed-loop client: all N requests arrive at zero, fill C, then drain.
+"""Finite closed-loop benchmark: all N requests arrive at time zero, C run at once, then drain.
 
-Only orchestration/reporting is new. Proposal, target verification, rejection
-sampling, KV state, Graph and transport use the existing validated V2 methods.
+Uses the same proposal, verification, sampling, KV state, graphs and transport
+as the steady-state benchmark; only the workload shape and reporting differ.
 """
 from collections import Counter, deque
 from dataclasses import asdict
@@ -11,7 +11,9 @@ from pathlib import Path
 import time
 
 import torch
-from split_methods import benchmark as bench
+
+from . import bench_utils as bench
+from .steady_metrics import distribution
 
 
 @torch.inference_mode()
@@ -155,7 +157,6 @@ def run_finite(target, draft, config, tokenizer, source, *, concurrency, seed,
             tpot_ms=1000 * (row['completion_seconds']-row['first_token_seconds']) / (len(generated)-1) if len(generated)>1 else None,
             ttft_ms=1000 * row['first_token_seconds'], e2e_ms=1000 * row['completion_seconds'])
         reports.append(row)
-    from .latency_metrics import distribution
     tokens = sum(r['output_tokens'] for r in reports)
     rounds = sum(r['verify_rounds'] for r in reports)
     summary = dict(status='completed', method=target.method, config=asdict(config), seed=seed,

@@ -2,7 +2,6 @@
 
 Only sampled q scalars cross in phase one. Phase two requests one complete q
 row for each rejected request, not the whole [batch, gamma, vocabulary] cube.
-Reference torch operations intentionally precede graph/kernel optimization.
 """
 
 from dataclasses import dataclass

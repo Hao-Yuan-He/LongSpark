@@ -1,1 +1,1 @@
-"""Portable evaluation entry points for the optimized LongSpark runtime."""
+"""LongSpark evaluation launcher and runtime."""

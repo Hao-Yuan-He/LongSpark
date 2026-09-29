@@ -133,6 +133,12 @@ python scripts/check_correctness.py \
 
 `--dataset` takes `native`, `longspec_32k`, `code_64k`, or `longswe_128k`. A run passes only when every request matches. The runner switches the target to deterministic kernels, so its timings are not speed measurements.
 
+Two low-level GPU checks cover the registered CUDA IPC transport and the 14B attention adapter. The IPC test needs two peer-accessible GPUs.
+
+```bash
+LONGSPARK_TEST_GPUS=0,1 python -m pytest tests/gpu
+```
+
 ## Troubleshooting
 
 | Symptom | Fix |

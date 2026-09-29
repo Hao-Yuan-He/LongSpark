@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "longspark"
+version = "0.1.0"
+description = "LongSpark split target/draft speculative decoding evaluation"
+readme = "README.md"
+requires-python = "==3.11.*"
+# Runtime dependencies are pinned in requirements.txt (CUDA 12.8 wheels, including
+# direct URLs) and installed by scripts/install.sh; they are not repeated here.
+dependencies = []
+
+[tool.setuptools.packages.find]
+where = ["src"]

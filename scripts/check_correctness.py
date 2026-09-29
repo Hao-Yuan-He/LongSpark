@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 """Compare fully drained greedy output from separate AR and LongSpark processes."""
 import argparse
-import hashlib
 import importlib.metadata
 import json
-import os
 from pathlib import Path
 import subprocess
 import sys
 
-ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / 'src'))
-from longspark.cli import environment, require_idle, write_new
-from longspark.validate import validate_models, validate_repository
+import _bootstrap  # noqa: F401
+from longspark.gpus import require_idle_gpus, worker_environment
+from longspark.paths import REPO_ROOT as ROOT
+from longspark.utils import read_jsonl, sha256_file, write_json
+from longspark.validate import validate_fixtures, validate_models
+
+PACKAGES = ('torch', 'transformers', 'triton', 'sglang-kernel', 'flashinfer-python', 'huggingface-hub')
 
 
 def main():
@@ -32,7 +33,7 @@ def main():
     tp = 1 if a.dataset == 'native' else 4
     if len(set(gpus)) != len(gpus) or min(gpus) < 0 or len(gpus) < tp + 1:
         p.error(f'Distinct GPU IDs required: {tp} target devices and one drafter')
-    validate_repository()
+    validate_fixtures()
     models = {k: str((ROOT / v).resolve()) for k, v in json.loads(a.models.read_text())[a.size].items()}
     validate_models(dict(method='longspark', models=models))
     out = a.output.resolve()
@@ -44,12 +45,12 @@ def main():
                max_new_tokens=a.max_new_tokens, concurrency=a.concurrency, seed=a.seed,
                temperature=0., deterministic_inference=True, physical_gpus=gpus[:tp+1],
                python=sys.version, executable=sys.executable,
-               packages={name: importlib.metadata.version(name) for name in ('torch','transformers','triton','sglang-kernel','flashinfer-python','huggingface-hub')},
+               packages={name: importlib.metadata.version(name) for name in PACKAGES},
                deterministic_mm='triton', batch_variant_mm_fallback=False,
-               source_sha256={str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(source_files)})
-    write_new(out / 'job.json', job)
-    require_idle(gpus[:tp+1])
-    env = environment(gpus[:tp+1])
+               source_sha256={str(p.relative_to(ROOT)): sha256_file(p) for p in sorted(source_files)})
+    write_json(out / 'job.json', job)
+    require_idle_gpus(gpus[:tp + 1])
+    env = worker_environment(gpus[:tp + 1])
     env['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8'
     # Keep the deterministic Triton implementation. The bundled DeepGEMM
     # path is incompatible with this environment's storage-less dispatch.
@@ -58,25 +59,29 @@ def main():
     for method in ('vanilla', 'longspark'):
         print(f'RUN {a.size} {a.dataset} {method}', flush=True)
         with (out / f'{method}.log').open('x') as log:
-            subprocess.run([sys.executable, '-m', 'longspark.correctness', str(out/'job.json'), method],
+            subprocess.run([sys.executable, '-m', 'longspark.correctness', str(out / 'job.json'), method],
                            cwd=ROOT, env=env, stdout=log, stderr=subprocess.STDOUT, check=True)
+
     def read(method):
-        return {r['source_id']: r for r in (json.loads(s) for s in (out/method/'result.requests.jsonl').read_text().splitlines())}
+        return {r['source_id']: r for r in read_jsonl(out / method / 'result.requests.jsonl')}
+
     ar, draft = read('vanilla'), read('longspark')
     checks = []
     for key in sorted(ar.keys() | draft.keys()):
         left, right = ar.get(key), draft.get(key)
         x, y = (left or {}).get('output_ids', []), (right or {}).get('output_ids', [])
         exact = bool(left and right and x == y and left['input_sha256'] == right['input_sha256'])
+        mismatch = next((i for i, (u, v) in enumerate(zip(x, y)) if u != v),
+                        min(len(x), len(y)) if len(x) != len(y) else None)
         checks.append(dict(source_id=key, passed=exact, reference_tokens=len(x), speculative_tokens=len(y),
-                           first_mismatch=next((i for i, pair in enumerate(zip(x,y)) if pair[0] != pair[1]),
-                                               min(len(x),len(y)) if len(x) != len(y) else None)))
-    result_files = [out/m/f for m in ('vanilla','longspark') for f in ('result.json','result.requests.jsonl','execution.json')]
+                           first_mismatch=mismatch))
+    result_files = [out / m / f for m in ('vanilla', 'longspark')
+                    for f in ('result.json', 'result.requests.jsonl', 'execution.json')]
     receipt = dict(passed=bool(checks) and all(x['passed'] for x in checks), comparison='exact-token-ids',
                    size=a.size, dataset=a.dataset, temperature=0., deterministic_inference=True,
                    checked_requests=len(checks), checked_reference_tokens=sum(x['reference_tokens'] for x in checks),
-                   checks=checks, files_sha256={str(p.relative_to(out)):hashlib.sha256(p.read_bytes()).hexdigest() for p in result_files})
-    write_new(out/'correctness.json', receipt)
+                   checks=checks, files_sha256={str(p.relative_to(out)): sha256_file(p) for p in result_files})
+    write_json(out / 'correctness.json', receipt)
     print(json.dumps(receipt, indent=2))
     return 0 if receipt['passed'] else 1
 

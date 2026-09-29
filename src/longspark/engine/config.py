@@ -1,4 +1,4 @@
-"""Validated device and independent cache budgets for split speculation."""
+"""Device placement and cache budgets for a split target/draft run."""
 
 from dataclasses import dataclass
 import math

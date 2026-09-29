@@ -6,4 +6,5 @@ python_bin="${PYTHON_BIN:-python}"
 "$python_bin" -m pip install --no-compile torch==2.11.0+cu128 torchvision==0.26.0+cu128 torchaudio==2.11.0+cu128 \
   --index-url https://download.pytorch.org/whl/cu128
 "$python_bin" -m pip install --no-compile -r "$repo_dir/requirements.txt"
+"$python_bin" -m pip install --no-compile --no-deps -e "$repo_dir"
 "$python_bin" -m pip check

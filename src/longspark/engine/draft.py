@@ -84,12 +84,12 @@ class LongSparkDraft:
         self.embedding, self.head, self.norm = target_modules(model_path, self.device)
         self.model = DraftFreeKVModel.from_pretrained(draft_path, torch_dtype=torch.bfloat16).to(self.device).eval()
         _restore_dfk_parallel_qwen_inv_freq(self.model)
-        from .position import configure_split_longspark, configure_native
-        self.position_audit = configure_split_longspark(self.model, target_ready, config.position_variant)
+        from .position import configure_draft_rope, configure_executor_rope
+        self.position_audit = configure_draft_rope(self.model, target_ready, config.position_variant)
         _verify_global16_shared_rope(self.model)
         _install_global16_sglang_rmsnorm(self.model)
         self.executor = build_global16_native_draft_executor(self.model)
-        self.native_position_audit = configure_native(self.executor.decoder_layers, config.position_variant)
+        self.native_position_audit = configure_executor_rope(self.executor.decoder_layers, config.position_variant)
         self.layer_ids = list(self.model.config.target_layer_ids)
         self.query = self.model.global16_raw256_reference.global_query_generator.learned_query.detach()
         layers, heads, slots, dim = self.query.shape

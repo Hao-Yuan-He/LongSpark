@@ -3,10 +3,6 @@ import time
 
 import torch
 
-from .config import SplitConfig
-from .draft import LongSparkDraft
-from .target import TargetClient
-
 
 def prefix_tokens(row):
     return row["input_ids"] + row.get("generated", [])[:-1]

@@ -1,19 +1,5 @@
-"""Opt-in, post-timer request latency reporting; no scheduling/inference edits."""
-import math
-
-
-def distribution(values):
-    values = sorted(values)
-    if not values:
-        return dict(n=0, mean=None, p50=None, p90=None, p95=None, p99=None)
-
-    def quantile(q):
-        index = (len(values) - 1) * q
-        lo, hi = math.floor(index), math.ceil(index)
-        return values[lo] + (values[hi] - values[lo]) * (index - lo)
-
-    return dict(n=len(values), mean=sum(values) / len(values),
-                **{f'p{int(100*q)}': quantile(q) for q in (.5, .9, .95, .99)})
+"""Per-request latency added to steady-state summaries (reporting only; no scheduling changes)."""
+from ..engine.steady_metrics import distribution
 
 
 def request_latency(rows, *, begin, end):
@@ -79,9 +65,9 @@ def extend_summary(original, rows, *, begin, end):
     return dict(original, request_latency=request_latency(rows, begin=begin, end=end))
 
 
-def install_metrics():
-    """Only replace the CPU reporting callback, called AFTER timed execution."""
-    from split_methods import steady_benchmark as steady
+def install_request_latency_metrics():
+    """Wrap the CPU reporting callback, which runs only after timed execution."""
+    from ..engine import steady_benchmark as steady
     original = steady.summarize_window
     if getattr(original, '_request_latency_extension', False):
         return

@@ -1,4 +1,4 @@
-"""Unscaled Qwen3 RoPE; no shared module or checkpoint mutation."""
+"""Unscaled (native) Qwen3 RoPE; no shared module or checkpoint mutation."""
 import torch
 
 PUBLIC_CONTEXT = 40960

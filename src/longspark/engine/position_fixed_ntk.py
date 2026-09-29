@@ -1,27 +1,26 @@
-"""Narrow, opt-in fixed NTK-alpha4 contract for the LongSpark runtime."""
+"""Fixed NTK-aware RoPE scaling (alpha=4, 140K context) and its exactness audits."""
 
 from __future__ import annotations
 
-import json
 import math
 
 import torch
 
-from .longspark_position_contract import validate_mode
 from sglang.srt.utils.hf_transformers_utils import get_context_length
 
 
 ALPHA = 4.0
-FACTOR = ALPHA  # Keep the comparison adapter's naming convenient for callers.
 ORIGINAL_CONTEXT = 32768
 SERVICE_CONTEXT = 140288
 ORIGINAL_THETA = 1_000_000.0
-THETA = ORIGINAL_THETA
 ROTARY_DIM = 128
 MAX_POSITION_EMBEDDINGS = 140672
 EFFECTIVE_BASE = ORIGINAL_THETA * ALPHA ** (ROTARY_DIM / (ROTARY_DIM - 2))
-EFFECTIVE_THETA = EFFECTIVE_BASE
 MSCALE = 1.0
+# Model-config flag that marks a checkpoint override as using this adapter.
+FLAGS = {
+    "fixed_ntk": "longspark_fixed_ntk_v1",
+}
 POSITIONS = (
     0,
     1,
@@ -60,6 +59,25 @@ def reference_cos_sin(inv_freq, positions):
     angles = angles * inv_freq
     doubled = torch.cat((angles, angles), dim=-1)
     return doubled.cos() * MSCALE, doubled.sin() * MSCALE
+
+
+def configured_modes(config):
+    if config is None:
+        return set()
+    enabled = set()
+    for mode, flag in FLAGS.items():
+        value = getattr(config, flag, False)
+        if type(value) is not bool:
+            raise RuntimeError(f"Position adapter flag {flag} must be boolean")
+        if value:
+            enabled.add(mode)
+    return enabled
+
+
+def validate_mode(config, expected):
+    """Confirm exactly the expected static position adapter is enabled before graph capture."""
+    if configured_modes(config) != {expected}:
+        raise RuntimeError(f"Expected exactly the {expected} position adapter")
 
 
 def _validate_rope_parameters(name, values):
@@ -245,7 +263,7 @@ def audit_model_rotaries(model, config, context_length):
         native=False,
         context_length=context_length,
         alpha=ALPHA,
-        factor=FACTOR,
+        factor=ALPHA,
         original_context=ORIGINAL_CONTEXT,
         original_theta=ORIGINAL_THETA,
         theta_original=ORIGINAL_THETA,
@@ -264,7 +282,7 @@ def audit_model_rotaries(model, config, context_length):
     return report
 
 
-def _set_fixed_inv_freq(attention, inv_freq_fn=reference_inv_freq):
+def set_fixed_inv_freq(attention, inv_freq_fn=reference_inv_freq):
     old = getattr(attention, "inv_freq", None)
     if not isinstance(old, torch.Tensor):
         raise RuntimeError("LongSpark fixed NTK Draft attention has no RoPE buffer")
@@ -282,31 +300,6 @@ def _set_fixed_inv_freq(attention, inv_freq_fn=reference_inv_freq):
     else:
         attention.register_buffer("inv_freq", expected, persistent=False)
     attention._longspark_mscale = MSCALE
-
-
-def configure_longspark(draft_model, target_model, *,
-                        target_audit_attribute="_longspark_fixed_ntk_audit",
-                        inv_freq_fn=reference_inv_freq):
-    """Restore fixed frequencies after ordinary Qwen checkpoint restoration."""
-    if not hasattr(target_model, target_audit_attribute):
-        return None
-    layers = getattr(draft_model, "parallel_qwen_layers", None)
-    config = getattr(draft_model, "config", None)
-    theta = float(getattr(config, "qwen_rope_theta", float("nan")))
-    if not isinstance(layers, torch.nn.ModuleList) or len(layers) != 5:
-        raise RuntimeError(
-            "LongSpark fixed NTK requires the existing five-layer Qwen head"
-        )
-    if not math.isclose(theta, ORIGINAL_THETA, rel_tol=0.0, abs_tol=1e-6):
-        raise RuntimeError(
-            f"LongSpark fixed NTK requires original qwen_rope_theta={ORIGINAL_THETA}, got {theta!r}"
-        )
-    for layer in layers:
-        attention = getattr(layer, "self_attn", None)
-        if getattr(attention, "head_dim", None) != ROTARY_DIM:
-            raise RuntimeError("LongSpark fixed NTK requires head_dim=128")
-        _set_fixed_inv_freq(attention, inv_freq_fn)
-    return audit_longspark(layers, inv_freq_fn=inv_freq_fn)
 
 
 def audit_longspark(layers, native=False, *, inv_freq_fn=reference_inv_freq):
@@ -372,7 +365,7 @@ def audit_longspark(layers, native=False, *, inv_freq_fn=reference_inv_freq):
         layer_count=len(layers),
         native=native,
         alpha=ALPHA,
-        factor=FACTOR,
+        factor=ALPHA,
         original_theta=ORIGINAL_THETA,
         theta_original=ORIGINAL_THETA,
         theta=EFFECTIVE_BASE,
@@ -387,33 +380,17 @@ def audit_longspark(layers, native=False, *, inv_freq_fn=reference_inv_freq):
     )
 
 
-def log_report(logger, label, report):
-    logger.info(
-        "LONGSPARK_FIXED_NTK_AUDIT %s",
-        json.dumps(dict(label=label, **report), sort_keys=True),
-    )
-
-
-# Explicit aliases make the contract name clear to callers while preserving
-# the existing LongSpark adapter lifecycle used by the draft runner.
-configure_fixed_ntk = configure_longspark
-audit_fixed_ntk = audit_longspark
-
-
 __all__ = [
     "ALPHA",
     "EFFECTIVE_BASE",
-    "EFFECTIVE_THETA",
     "MAX_POSITION_EMBEDDINGS",
     "MSCALE",
     "POSITIONS",
-    "audit_fixed_ntk",
     "audit_longspark",
     "audit_model_rotaries",
-    "configure_fixed_ntk",
-    "configure_longspark",
-    "log_report",
     "reference_cos_sin",
     "reference_inv_freq",
+    "set_fixed_inv_freq",
     "validate_config",
+    "validate_mode",
 ]

@@ -1,8 +1,7 @@
-"""Closed-loop, fixed-time split-device benchmark with boundary-safe TPOT.
+"""Steady-state benchmark: a closed loop at fixed concurrency, measured over a fixed time window.
 
-Reuses the validated native SGLang target/draft adapters and seven-position
-rejection sampling unchanged. Prefill remains eager and serial. This is not
-an HTTP server or a claim about an overlapping production scheduler.
+Prefill is eager and serial. This measures the split target/draft engine
+directly; it is not an HTTP server or an overlapping production scheduler.
 """
 
 from collections import deque
@@ -15,8 +14,8 @@ import time
 
 import torch
 
-from .benchmark import (charged_tokens, prefix_tokens, reset_draft_stats, warmup,
-                        sync_device, reset_peak_memory, peak_memory, transport_report)
+from .bench_utils import (charged_tokens, prefix_tokens, reset_draft_stats,
+                          sync_device, reset_peak_memory, peak_memory, transport_report)
 from .steady_metrics import summarize_window, request_tpot
 
 

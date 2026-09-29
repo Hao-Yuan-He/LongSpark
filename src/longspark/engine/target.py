@@ -2,7 +2,7 @@
 
 TP is confined to these processes. The draft process never joins their process
 group, never loads a target transformer, and never sees target cache addresses.
-This adapter uses native TARGET_VERIFY CUDA Graphs when enabled and eager
+Uses native TARGET_VERIFY CUDA Graphs when enabled and eager
 EXTEND for prefill. It is not the SGLang HTTP scheduler.
 """
 
@@ -366,7 +366,7 @@ class PagedTarget:
         return checks
 
 
-def _target_process(rank, config, model_path, method, draft_path, port, controls, wire, seed):
+def target_process_main(rank, config, model_path, method, draft_path, port, controls, wire, seed):
     # Each rank has its own command pipe. Tensor transport exists only on rank 0.
     control = controls[rank]
     target = channel = None
@@ -541,7 +541,7 @@ class TargetClient:
         port = available_port()
         self.processes = []
         for rank in range(config.target_tp):
-            process = ctx.Process(target=_target_process,
+            process = ctx.Process(target=target_process_main,
                 args=(rank, config, model_path, method, draft_path, port, children, target_wire, seed))
             process.start()
             self.processes.append(process)
